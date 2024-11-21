@@ -315,6 +315,10 @@ const users = await response.json(); // Assuming the API returns an array of use
 													data-modal-target="edit-user-modal"
 													data-modal-toggle="edit-user-modal"
 													class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+													data-user-id={user.id}
+                          data-user-name={user.nombre}
+                          data-user-address={user.direccion}
+                          data-user-phone={user.telefono}												
 												>
 													<svg
 														class="w-4 h-4 mr-2"
@@ -331,6 +335,7 @@ const users = await response.json(); // Assuming the API returns an array of use
 															/>
 														</>
 													</svg>
+												
 													Edit user
 												</button>
 												<button
@@ -398,65 +403,31 @@ const users = await response.json(); // Assuming the API returns an array of use
 				<!-- Modal body Edits-->
 				<div class="p-6 space-y-6">
 					
-					<form action="#">
+					<form id="edit-user-form">
 						<div class="grid grid-cols-6 gap-6">
-							<div class="col-span-6 sm:col-span-3">
-								<label
-									for="first-name"
-									class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-									>Nombre</label
-								>
-								<input
-									type="text"
-									name="nombre"
-									value="{user.nombre}"
-									id="id_nombre"
-									class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-									required
-								/>
-							</div>
-							<div class="col-span-6 sm:col-span-3">
-								<label
-									for="last-name"
-									class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-									>Dirección</label
-								>
-								<input
-									type="text"
-									name="direccion"
-									value="{user.direccion}"
-									id="id_direccion"
-									class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-									placeholder="{user.direccion}"
-									required
-								/>
-							</div>
-							<div class="col-span-6 sm:col-span-3">
-								<label
-									for="email"
-									class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-									>Teléfono</label
-								>
-								<input
-									type="text"
-									name="telefono"
-									value="{user.telefono}"
-									id="id_telefono"
-									class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-									placeholder="{user.telefono}"
-									required
-								/>
-							</div>
+								<div class="col-span-6 sm:col-span-3">
+										<label for="id_nombre" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre</label>
+										<input type="text" id="id_nombre" class="block w-full p-2.5 bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg dark:bg-gray-700 dark:text-white" />
+								</div>
+								<div class="col-span-6 sm:col-span-3">
+										<label for="id_direccion" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Dirección</label>
+										<input type="text" id="id_direccion" class="block w-full p-2.5 bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg dark:bg-gray-700 dark:text-white" />
+								</div>
+								<div class="col-span-6 sm:col-span-3">
+										<label for="id_telefono" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Teléfono</label>
+										<input type="text" id="id_telefono" class="block w-full p-2.5 bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg dark:bg-gray-700 dark:text-white" />
+								</div>
 						</div>
-					</form>
+						
+				</form>
 					<!-- Modal footer -->
 					<div
 						class="items-center p-6 border-t border-gray-200 rounded-b dark:border-gray-700"
 					>
-						<button
-							class="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
-							type="submit">Save all</button
-						>
+					<button type="submit" class="px-5 py-2 text-sm font-medium text-white bg-primary-700 rounded-lg hover:bg-primary-800">
+						Guardar Cambios
+				</button>
+						
 					</div>
 					
 				</div>
@@ -630,30 +601,55 @@ const users = await response.json(); // Assuming the API returns an array of use
 </entities-crud>
 
 <script>
-	document.getElementById('add-user-form').addEventListener('submit', async (event) => {
-		event.preventDefault();
-		const nombre = document.getElementById('nombre').value;
-		const direccion = document.getElementById('direccion').value;
-		const telefono = document.getElementById('telefono').value;
+	// Llenar modal con los datos del usuario seleccionado
+	document.querySelectorAll('[data-modal-target="edit-user-modal"]').forEach((button) => {
+			button.addEventListener('click', (event) => {
+					const userId = button.dataset.userId;
+					const userName = button.dataset.userName;
+					const userAddress = button.dataset.userAddress;
+					const userPhone = button.dataset.userPhone;
 
-		try {
-			const response = await fetch('http://127.0.0.1:5000/users', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ nombre, direccion, telefono }),
+					console.log("Abriendo modal de edición para el usuario:", { userId, userName, userAddress, userPhone });
+
+					// Llenar campos del modal
+					document.getElementById('id_nombre').value = userName || '';
+					document.getElementById('id_direccion').value = userAddress || '';
+					document.getElementById('id_telefono').value = userPhone || '';
+
+					// Adjuntar el ID del usuario al modal
+					const modal = document.getElementById('edit-user-modal');
+					modal.dataset.userId = userId;
 			});
+	});
 
-			if (!response.ok) {
-				throw new Error('Error al guardar el usuario');
+	// Enviar datos actualizados al backend
+	document.querySelector('#edit-user-modal button[type="submit"]').addEventListener('click', async (event) => {
+			event.preventDefault();
+
+			const modal = document.getElementById('edit-user-modal');
+			const userId = modal.dataset.userId;
+			const nombre = document.getElementById('id_nombre').value;
+			const direccion = document.getElementById('id_direccion').value;
+			const telefono = document.getElementById('id_telefono').value;
+
+			console.log("Enviando actualización para:", { userId, nombre, direccion, telefono });
+
+			try {
+					const response = await fetch(`http://127.0.0.1:5000/users/${userId}`, {
+							method: 'PUT',
+							headers: {
+									'Content-Type': 'application/json',
+							},
+							body: JSON.stringify({ nombre, direccion, telefono }),
+					});
+
+					if (!response.ok) throw new Error("Error al actualizar el usuario");
+
+					alert("Usuario actualizado exitosamente");
+					location.reload();
+			} catch (error) {
+					console.error("Error:", error);
+					alert("No se pudo actualizar el usuario");
 			}
-
-			alert('Usuario agregado exitosamente');
-			location.reload();
-		} catch (error) {
-			console.error(error);
-			alert('No se pudo agregar el usuario');
-		}
 	});
 </script>
