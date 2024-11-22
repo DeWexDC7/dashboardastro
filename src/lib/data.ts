@@ -31,3 +31,4 @@ export function asset(path: string) {
 	// NOTE: Fetching remote assets from the Hugo admin dashboard Vercel dist.
 	return `${REMOTE_ASSETS_BASE_URL}/${path}`;
 }
+
