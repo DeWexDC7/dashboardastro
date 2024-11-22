@@ -316,9 +316,9 @@ const users = await response.json(); // Assuming the API returns an array of use
 													data-modal-toggle="edit-user-modal"
 													class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
 													data-user-id={user.id}
-                          data-user-name={user.nombre}
-                          data-user-address={user.direccion}
-                          data-user-phone={user.telefono}												
+													data-user-name={user.nombre}
+													data-user-address={user.direccion}
+													data-user-phone={user.telefono}												
 												>
 													<svg
 														class="w-4 h-4 mr-2"
@@ -601,8 +601,44 @@ const users = await response.json(); // Assuming the API returns an array of use
 </entities-crud>
 
 <script>
-	// Llenar modal con los datos del usuario seleccionado
-	document.querySelectorAll('[data-modal-target="edit-user-modal"]').forEach((button) => {
+   // Manejar el formulario de agregar usuario
+document.getElementById('add-user-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    // Capturar los datos del formulario
+    const nombre = document.getElementById('nombre').value.trim();
+    const direccion = document.getElementById('direccion').value.trim();
+    const telefono = document.getElementById('telefono').value.trim();
+
+    console.log("Datos para agregar usuario:", { nombre, direccion, telefono });
+
+    try {
+        // Enviar los datos al backend
+        const response = await fetch('http://127.0.0.1:5000/users', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ nombre, direccion, telefono }),
+        });
+
+        if (!response.ok) {
+            console.error("Error en la respuesta de la API al agregar usuario:", await response.text());
+            throw new Error('Error al agregar el usuario');
+        }
+
+        // Notificar al usuario y recargar la página
+        alert('Usuario agregado exitosamente');
+        location.reload();
+    } catch (error) {
+        console.error("Error al agregar usuario:", error);
+        alert("No se pudo agregar el usuario. Revisa la consola para más detalles.");
+    }
+});
+
+// Manejar el formulario de editar usuario
+// Llenar modal con los datos del usuario seleccionado
+document.querySelectorAll('[data-modal-target="edit-user-modal"]').forEach((button) => {
 			button.addEventListener('click', (event) => {
 					const userId = button.dataset.userId;
 					const userName = button.dataset.userName;
