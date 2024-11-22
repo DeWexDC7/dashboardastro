@@ -338,11 +338,13 @@ const users = await response.json(); // Assuming the API returns an array of use
 												
 													Edit user
 												</button>
+												<!-- Delete user button -->
 												<button
 													type="button"
 													data-modal-target="delete-user-modal"
 													data-modal-toggle="delete-user-modal"
 													class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-800 focus:ring-4 focus:ring-red-300 dark:focus:ring-red-900"
+												  data-user-id={user.id}
 												>
 													<svg
 														class="w-4 h-4 mr-2"
@@ -688,4 +690,39 @@ document.querySelectorAll('[data-modal-target="edit-user-modal"]').forEach((butt
 					alert("No se pudo actualizar el usuario");
 			}
 	});
+	// Manejar la eliminación de usuario
+document.querySelectorAll('[data-modal-target="delete-user-modal"]').forEach((button) => {
+    button.addEventListener('click', (event) => {
+        const userId = button.dataset.userId;
+        console.log("Abriendo modal de eliminación para el usuario:", userId);
+
+        // Adjuntar el ID del usuario al modal
+        const modal = document.getElementById('delete-user-modal');
+        modal.dataset.userId = userId;
+    });
+});
+
+// Enviar solicitud de eliminación al backend
+document.querySelector('#delete-user-modal .text-white.bg-red-600').addEventListener('click', async (event) => {
+    event.preventDefault();
+
+    const modal = document.getElementById('delete-user-modal');
+    const userId = modal.dataset.userId;
+
+    console.log("Enviando solicitud de eliminación para el usuario:", userId);
+
+    try {
+        const response = await fetch(`http://127.0.0.1:5000/users/${userId}`, {
+            method: 'DELETE',
+        });
+
+        if (!response.ok) throw new Error("Error al eliminar el usuario");
+
+        alert("Usuario eliminado exitosamente");
+        location.reload(); // Recargar la página para reflejar los cambios
+    } catch (error) {
+        console.error("Error:", error);
+        alert("No se pudo eliminar el usuario");
+    }
+});
 </script>
