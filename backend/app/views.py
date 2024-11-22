@@ -5,22 +5,35 @@ main = Blueprint('main', __name__)
 
 @main.route('/users', methods=['GET'])
 def get_users():
-    return jsonify(get_all_users())
+    users = get_all_users()
+    return jsonify(sorted(users, key=lambda user: user['id']))
 
 @main.route('/users/<int:id>', methods=['GET'])
 def get_user(id):
-    return jsonify(get_user_by_id(id))
+    user = get_user_by_id(id)
+    if user:
+        return jsonify(user)
+    return jsonify({'error': 'User not found'}), 404
 
 @main.route('/users', methods=['POST'])
 def add_user():
     data = request.get_json()
-    return jsonify(create_user(data)), 201
+    if not data or not all(key in data for key in ('nombre', 'direccion', 'telefono')):
+        return jsonify({'error': 'Invalid data'}), 400
+    new_user = create_user(data)
+    return jsonify(new_user), 201
 
 @main.route('/users/<int:id>', methods=['PUT'])
 def modify_user(id):
     data = request.get_json()
-    return jsonify(update_user(id, data))
+    updated_user = update_user(id, data)
+    if updated_user:
+        return jsonify(updated_user)
+    return jsonify({'error': 'User not found'}), 404
 
 @main.route('/users/<int:id>', methods=['DELETE'])
 def remove_user(id):
-    return delete_user(id)
+    success = delete_user(id)
+    if success:
+        return jsonify({'message': 'User deleted successfully'}), 200
+    return jsonify({'error': 'User not found'}), 404
