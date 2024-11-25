@@ -1,5 +1,7 @@
 ---
 import NavPagination from '../components/NavPagination.astro';
+import Swal from 'sweetalert2'
+
 
 const { class: clazz } = Astro.props;
 
@@ -10,6 +12,11 @@ if (!response.ok) {
 }
 const users = await response.json(); // Assuming the API returns an array of users
 ---
+
+<head>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
 
 <entities-crud
 	type="users"

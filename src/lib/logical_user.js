@@ -1,3 +1,6 @@
+//Importación de la librería
+import Swal from 'sweetalert2';
+
 // Manejar el formulario de agregar usuario
 document.getElementById('add-user-form').addEventListener('submit', async (event) => {
 	event.preventDefault();
@@ -25,7 +28,12 @@ document.getElementById('add-user-form').addEventListener('submit', async (event
 			}
 
 			// Notificar al usuario y recargar la página
-			alert('Usuario agregado exitosamente');
+			await Swal.fire({
+				title: 'Usuario registrado',
+				text: 'Usuario ingresado exitosamente',
+				icon: 'success',
+			});
+			//location.reload();
 
 			//limpiar los campos del formulario
 			document.getElementById('nombre').value = '';
@@ -39,7 +47,11 @@ document.getElementById('add-user-form').addEventListener('submit', async (event
 			location.reload();
 	} catch (error) {
 			console.error("Error al agregar usuario:", error);
-			alert("No se pudo agregar el usuario. Revisa la consola para más detalles.");
+			await Swal.fire({
+				title: 'Usuario no registrado',
+				text: 'Usuario no se pudo ingresar',
+				icon: 'error',	
+			});
 	}
 });
 
@@ -94,51 +106,63 @@ document.querySelector('#edit-user-modal button[type="submit"]').addEventListene
 
 				if (!response.ok) throw new Error("Error al actualizar el usuario");
 
-				alert("Usuario actualizado exitosamente");
+				await Swal.fire({
+					title: 'Usuario actualizado',
+					text: 'Usuario actualizado exitosamente',
+					icon: 'success',
+				});
 				location.reload();
+
 		} catch (error) {
-				console.error("Error:", error);
-				alert("No se pudo actualizar el usuario");
+			await Swal.fire({
+				title: 'Usuario sin actualizar',
+				text: 'Usuario no se puede actualizar',
+				icon: 'error',
+			});
+			location.reload();
 		}
 });
-// Manejar la eliminación de usuario
+// Manejar la eliminación de usuario con SweetAlert2
 document.querySelectorAll('[data-modal-target="delete-user-modal"]').forEach((button) => {
-	button.addEventListener('click', (event) => {
-			const userId = button.dataset.userId;
-			const userName = button.closest('tr').querySelector('td:nth-child(3)').textContent; // Obtener el nombre del usuario desde la fila
+	button.addEventListener('click', async () => {
+					const userId = button.dataset.userId;
+					const userName = button.closest('tr').querySelector('td:nth-child(3)').textContent;
 
-			console.log("Abriendo modal de eliminación para el usuario:", { userId, userName });
+					console.log("Preparando eliminación para el usuario:", { userId, userName });
 
-			// Adjuntar el ID del usuario al modal
-			const modal = document.getElementById('delete-user-modal');
-			modal.dataset.userId = userId;
+					const result = await Swal.fire({
+									title: `Eliminar Usuario`,
+									text: `¿Estás seguro de que quieres eliminar a ${userName}?`,
+									icon: 'warning',
+									showCancelButton: true,
+									confirmButtonColor: '#d33',
+									cancelButtonColor: '#3085d6',
+									confirmButtonText: 'Sí, eliminar',
+									cancelButtonText: 'Cancelar',
+					});
 
-			// Mostrar el nombre del usuario en el mensaje
-			const deleteUserNameElement = document.getElementById('delete-user-name');
-			deleteUserNameElement.textContent = `Are you sure you want to delete the user, ${userName}?`;
+					if (result.isConfirmed) {
+									try {
+													const response = await fetch(`http://127.0.0.1:5000/users/${userId}`, {
+																	method: 'DELETE',
+													});
+
+													if (!response.ok) throw new Error("Error al eliminar el usuario");
+
+													Swal.fire({
+																	title: 'Usuario eliminado',
+																	text: `El usuario ${userName} fue eliminado exitosamente`,
+																	icon: 'success',
+													}).then(() => location.reload());
+									} catch (error) {
+													console.error("Error al eliminar usuario:", error);
+													Swal.fire({
+																	title: 'Error',
+																	text: 'No se pudo eliminar el usuario',
+																	icon: 'error',
+													});
+									}
+					}
 	});
 });
 
-// Enviar solicitud de eliminación al backend
-document.querySelector('#delete-user-modal .text-white.bg-red-600').addEventListener('click', async (event) => {
-	event.preventDefault();
-
-	const modal = document.getElementById('delete-user-modal');
-	const userId = modal.dataset.userId;
-
-	console.log("Enviando solicitud de eliminación para el usuario:", userId);
-
-	try {
-			const response = await fetch(`http://127.0.0.1:5000/users/${userId}`, {
-					method: 'DELETE',
-			});
-
-			if (!response.ok) throw new Error("Error al eliminar el usuario");
-
-			alert("Usuario eliminado exitosamente");
-			location.reload(); // Recargar la página para reflejar los cambios
-	} catch (error) {
-			console.error("Error:", error);
-			alert("No se pudo eliminar el usuario");
-	}
-});
