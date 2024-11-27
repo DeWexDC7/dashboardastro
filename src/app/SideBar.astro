@@ -76,12 +76,12 @@ const filteredData = hasData ? data.map((item) => item.nombre_region).filter(Boo
 							</svg>
 						</button>
 						<ul id="dropdown-crud" class="hidden py-2 space-y-2">
-							<!-- Items dinámicos -->
+							<!-- Items dinámicos href={`/crud/${region}`}-->
 							{filteredData.length > 0 ? (
 								filteredData.map((region, index) => (
 									<li key={index}>
 										<a
-											href={`/crud/${region}`}
+											href={`/crud/users`}
 											class="text-base text-gray-900 rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 dark:text-gray-200 dark:hover:bg-gray-700"
 										>
 											{region}
