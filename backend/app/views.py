@@ -1,39 +1,51 @@
 from flask import Blueprint, jsonify, request
-from .controllers import get_all_users, get_user_by_id, create_user, update_user, delete_user
+from .controllers import get_all_users, get_user_by_id, create_user, update_user, \
+delete_user, get_all_tipo_inventario, get_all_tipo_dato, get_usuario_by_id, get_registro_inventario_by_id, \
+get_all_registro_inventario_campos, get_tipo_inventario_by_id, create_registro_inventario, \
+create_registro_inventario_campo, update_registro_inventario, delete_registro_inventario
 
 main = Blueprint('main', __name__)
 
-@main.route('/users', methods=['GET'])
-def get_users():
-    users = get_all_users()
-    return jsonify(sorted(users, key=lambda user: user['id']))
+@main.route('/tipo_inventario', methods=['GET'])
+def get_tipos_inventario():
+    return jsonify(get_all_tipo_inventario())
 
-@main.route('/users/<int:id>', methods=['GET'])
-def get_user(id):
-    user = get_user_by_id(id)
-    if user:
-        return jsonify(user)
-    return jsonify({'error': 'User not found'}), 404
+@main.route('/tipo_inventario/<int:id_tipo_inv>', methods=['GET'])
+def get_tipo_inventario(id_tipo_inv):
+    return jsonify(get_tipo_inventario_by_id(id_tipo_inv))
 
-@main.route('/users', methods=['POST'])
-def add_user():
+@main.route('/tipo_dato', methods=['GET'])
+def get_tipo_dato():
+    return jsonify(get_all_tipo_dato())
+
+@main.route('/usuarios/<int:id_user>', methods=['GET'])
+def get_usuario(id_user):
+    return jsonify(get_usuario_by_id(id_user))
+
+@main.route('/registro_inventario/<int:id_registro>', methods=['GET'])
+def get_registro_inventario(id_registro):
+    return jsonify(get_registro_inventario_by_id(id_registro))
+
+@main.route('/registro_inventario', methods=['POST'])
+def add_registro_inventario():
     data = request.get_json()
-    if not data or not all(key in data for key in ('nombre', 'direccion', 'telefono')):
-        return jsonify({'error': 'Invalid data'}), 400
-    new_user = create_user(data)
-    return jsonify(new_user), 201
+    return jsonify(create_registro_inventario(data)), 201
 
-@main.route('/users/<int:id>', methods=['PUT'])
-def modify_user(id):
+@main.route('/registro_inventario/<int:id_registro>', methods=['PUT'])
+def edit_registro_inventario(id_registro):
     data = request.get_json()
-    updated_user = update_user(id, data)
-    if updated_user:
-        return jsonify(updated_user)
-    return jsonify({'error': 'User not found'}), 404
+    return jsonify(update_registro_inventario(id_registro, data)), 200
 
-@main.route('/users/<int:id>', methods=['DELETE'])
-def remove_user(id):
-    success = delete_user(id)
-    if success:
-        return jsonify({'message': 'User deleted successfully'}), 200
-    return jsonify({'error': 'User not found'}), 404
+@main.route('/registro_inventario_campos', methods=['GET'])
+def get_registro_inventario_campos():
+    return jsonify(get_all_registro_inventario_campos())
+
+@main.route('/registro_inventario_campos', methods=['POST'])
+def add_registro_inventario_campos():
+    data = request.get_json()
+    return jsonify(create_registro_inventario_campo(data, 5)), 201
+
+@main.route('/registro_inventario/<int:id_registro>', methods=['DELETE'])
+def eliminate_registro_inventario(id_registro):
+    return jsonify(delete_registro_inventario(id_registro)), 204
+
